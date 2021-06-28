@@ -1,18 +1,58 @@
-use bindings::Windows::{
-    Win32::System::Threading::{CreateEventW, SetEvent, WaitForSingleObject},
-    Win32::System::WindowsProgramming::CloseHandle,
-    Win32::UI::WindowsAndMessaging::{MessageBoxA, MB_OK, MB_ICONEXCLAMATION},
-};
+#![windows_subsystem = "windows"]
 
-fn main() -> windows::Result<()> {
-    unsafe {
-        let event = CreateEventW(std::ptr::null_mut(), true, false, None);
-        SetEvent(event).ok()?;
-        WaitForSingleObject(event, 0);
-        CloseHandle(event).ok()?;
+use bindings::*;
+use windows::*;
 
-        MessageBoxA(None, "THERE CAN BE ONLY ONE!!!", "MY FIRST RUST-BASED WINDOWS PROGRAM", MB_OK | MB_ICONEXCLAMATION);
+use bindings::{Windows::ApplicationModel::Core::*, Windows::UI::Core::*};
+
+#[implement(Windows::ApplicationModel::Core::IFrameworkViewSource)]
+struct CoreApp();
+
+#[allow(non_snake_case)]
+impl CoreApp {
+    fn CreateView(&self) -> Result<IFrameworkView> {
+        // TODO: need self query `self.into()` to support implementing both IFrameworkViewSource and IFrameworkView on the same object.
+        Ok(CoreAppView().into())
+    }
+}
+
+#[implement(Windows::ApplicationModel::Core::IFrameworkView)]
+struct CoreAppView();
+
+#[allow(non_snake_case)]
+impl CoreAppView {
+    fn Initialize(&self, _: &Option<CoreApplicationView>) -> Result<()> {
+        Ok(())
     }
 
+    fn Load(&self, _: &HSTRING) -> Result<()> {
+        Ok(())
+    }
+
+    fn Uninitialize(&self) -> Result<()> {
+        Ok(())
+    }
+
+    fn Run(&self) -> Result<()> {
+        let window = CoreWindow::GetForCurrentThread()?;
+        window.Activate()?;
+
+        let dispatcher = window.Dispatcher()?;
+        dispatcher.ProcessEvents(CoreProcessEventsOption::ProcessUntilQuit)?;
+
+        Ok(())
+    }
+
+    fn SetWindow(&self, _: &Option<CoreWindow>) -> Result<()> {
+        Ok(())
+    }
+}
+
+fn main() -> Result<()> {
+    initialize_mta()?;
+
+    let app: IFrameworkViewSource = CoreApp.into();
+
+    CoreApplication::Run(app)?;
     Ok(())
 }
