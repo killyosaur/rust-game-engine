@@ -3,7 +3,7 @@ fn main() {
         Windows::{
             Foundation::Numerics::Matrix3x2,
             Win32::{
-                Foundation::{DXGI_STATUS_OCCLUDED, HINSTANCE, HWND, LPARAM, LRESULT, PSTR, WPARAM},
+                Foundation::{DXGI_STATUS_OCCLUDED, HINSTANCE, HWND, LPARAM, LRESULT, PWSTR, WPARAM},
                 Graphics::{
                     Direct2D::{
                         CLSID_D2D1Shadow, D2D1CreateFactory, ID2D1Bitmap1, ID2D1Device,
@@ -15,10 +15,10 @@ fn main() {
                         DXGI_ERROR_UNSUPPORTED, DXGI_FORMAT, DXGI_PRESENT_TEST,
                         DXGI_USAGE_RENDER_TARGET_OUTPUT,
                     },
-                    Gdi::{BeginPaint, EndPaint, PAINTSTRUCT, HDC},
+                    Gdi::{BeginPaint, EndPaint, GetStockObject, CreateSolidBrush, PAINTSTRUCT, RGBTRIPLE, HDC, HBRUSH},
                 },
                 System::{
-                    LibraryLoader::GetModuleHandleA,
+                    LibraryLoader::GetModuleHandleW,
                     Performance::{QueryPerformanceCounter, QueryPerformanceFrequency},
                     SystemInformation::GetLocalTime,
                 },
@@ -28,11 +28,13 @@ fn main() {
                         UIAnimationManager, UIAnimationTransitionLibrary,
                     },
                     WindowsAndMessaging::{
-                        CreateWindowExA, DefWindowProcA, DispatchMessageA, GetMessageA, GetWindowLongA,
-                        GetWindowLongPtrA, LoadCursorW, PeekMessageA, PostQuitMessage, RegisterClassA,
-                        SetWindowLongA, SetWindowLongPtrA, CREATESTRUCTA, CW_USEDEFAULT, IDC_HAND, MSG,
-                        SIZE_MINIMIZED, WINDOW_LONG_PTR_INDEX, WM_ACTIVATE, WM_DESTROY, WM_CREATE,
-                        WM_DISPLAYCHANGE, WM_NCCREATE, WM_PAINT, WM_QUIT, WM_SIZE, WM_USER, WNDCLASSA,
+                        CreateWindowExW, DefWindowProcW, DispatchMessageW, GetMessageW, GetWindowLongW,
+                        GetWindowLongPtrW, LoadCursorW, PeekMessageW, PostQuitMessage, RegisterClassExW,
+                        SetWindowLongW, SetWindowLongPtrW, TranslateMessage, LoadIconW,
+                        CREATESTRUCTW, CW_USEDEFAULT,
+                        IDC_HAND, IDC_ARROW, MSG, SIZE_MINIMIZED, WINDOW_LONG_PTR_INDEX, WM_ACTIVATE, WM_DESTROY,
+                        WM_CREATE, IDI_APPLICATION,
+                        WM_DISPLAYCHANGE, WM_NCCREATE, WM_PAINT, WM_QUIT, WM_SIZE, WM_USER, WNDCLASSEXW,
                     },
                 },
             },
