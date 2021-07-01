@@ -1,3 +1,5 @@
+mod game;
+
 use bindings::{
     Windows::{
         Win32::{
@@ -17,6 +19,8 @@ use std::mem::transmute;
 use windows::*;
 
 fn main() -> Result<()> {
+    initialize_mta()?;
+    
     run_app("GAME_WINDOW".to_string())?;
 
     Ok(())
@@ -24,14 +28,14 @@ fn main() -> Result<()> {
 
 #[derive(Clone)]
 struct Window {
-    hwnd: HWND
+    handle: HWND
 }
 
 fn run_app(name: String) -> Result<()> {
     unsafe {
         let instance = GetModuleHandleW(None);
         let mut window = Window {
-            hwnd: HWND(0)
+            handle: HWND(0)
         };
         debug_assert!(instance.0 != 0);
 
@@ -40,7 +44,9 @@ fn run_app(name: String) -> Result<()> {
             hCursor: LoadCursorW(None, IDC_ARROW),
             hInstance: instance,
             lpszClassName: PWSTR(name.as_ptr() as _),
+            lpszMenuName: PWSTR::NULL,
             hbrBackground: CreateSolidBrush(0),
+            hIcon: LoadIconW(None, IDI_APPLICATION),
             hIconSm: LoadIconW(None, IDI_APPLICATION),
             cbClsExtra: 0,
             cbWndExtra: 0,
@@ -56,17 +62,22 @@ fn run_app(name: String) -> Result<()> {
         let handle = CreateWindowExW(
             Default::default(),               // extended style
             PWSTR(name.as_ptr() as _),        // class
-            "Your Basic Window, in Rust",     // title
+            "T3D Game Console Version 1.0",   // title
             WS_OVERLAPPEDWINDOW | WS_VISIBLE, 
             CW_USEDEFAULT, CW_USEDEFAULT,     // initial x, y
-            400, 400,                         // initial width, height
+            1600, 900,                        // initial width, height
             None,                             // handled to parent
             None,                             // handle to menu
             instance,                         // instance of this application
             &mut window as *mut _ as _,       // extra creation params
         );
 
+        window.handle = handle;
+
         debug_assert!(!handle.is_null());
+
+        // initialize game here
+        game::game_init::game_init();
 
         loop {
             let mut message = MSG::default();
@@ -81,8 +92,14 @@ fn run_app(name: String) -> Result<()> {
                 if message.message == WM_QUIT {
                     break;
                 }
+
+                // main game processing goes here
+                game::game_main::game_main(handle);
             }
         }
+
+        // close down game here
+        game::game_shutdown::game_shutdown();
 
         // return to Windows like this
         Ok(())
