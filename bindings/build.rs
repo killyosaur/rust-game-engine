@@ -4,7 +4,7 @@ fn main() {
             Win32::{
                 Foundation::{HINSTANCE, HWND, LPARAM, LRESULT, PWSTR, WPARAM},
                 Graphics::{
-                    Direct2d::*,
+                    Direct2D::*,
                     Gdi::{BeginPaint, EndPaint, GetStockObject, CreateSolidBrush, PAINTSTRUCT, HDC, HBRUSH},
                 },
                 System::{
