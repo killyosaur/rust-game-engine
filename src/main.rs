@@ -10,7 +10,9 @@ use bindings::{
             UI::{
                 WindowsAndMessaging::*,
             },
-            Graphics::Gdi::*,
+            Graphics::{
+                Gdi::*,
+            },
         }
     }
 };
@@ -28,14 +30,14 @@ fn main() -> Result<()> {
 
 #[derive(Clone)]
 struct Window {
-    handle: HWND
+    handle: HWND,
 }
 
 fn run_app(name: String) -> Result<()> {
     unsafe {
         let instance = GetModuleHandleW(None);
         let mut window = Window {
-            handle: HWND(0)
+            handle: HWND(0),
         };
         debug_assert!(instance.0 != 0);
 
