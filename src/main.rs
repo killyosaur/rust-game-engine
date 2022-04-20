@@ -21,8 +21,6 @@ use std::mem::transmute;
 use windows::*;
 
 fn main() -> Result<()> {
-    initialize_mta()?;
-    
     run_app("GAME_WINDOW".to_string())?;
 
     Ok(())
