@@ -1,24 +1,32 @@
 mod game;
 
-use bindings::{
-    Windows::{
-        Win32::{
-            Foundation::*,
-            System::{
-                LibraryLoader::GetModuleHandleW
-            },
-            UI::{
-                WindowsAndMessaging::*,
-            },
-            Graphics::{
-                Gdi::*,
-            },
+use std::mem::transmute;
+use windows::{
+    core::{
+        Result,
+        PCWSTR
+    },
+    Win32::{
+        Foundation::{HWND, LPARAM, LRESULT, WPARAM},
+        Graphics::{
+            Direct3D::*,
+            Gdi::{BeginPaint, EndPaint, CreateSolidBrush, PAINTSTRUCT, HDC},
+        },
+        System::{
+            LibraryLoader::GetModuleHandleW
+        },
+        UI::{
+            WindowsAndMessaging::{
+                CreateWindowExW, DefWindowProcW, DispatchMessageW,
+                LoadCursorW, PeekMessageW, PostQuitMessage, RegisterClassExW,
+                SetWindowLongW, TranslateMessage, LoadIconW, PM_REMOVE, GWLP_USERDATA,
+                CREATESTRUCTW, CW_USEDEFAULT, IDC_ARROW, MSG, WM_DESTROY,
+                WM_CREATE, IDI_APPLICATION, CS_DBLCLKS, CS_OWNDC, CS_HREDRAW, CS_VREDRAW,
+                WM_PAINT, WM_QUIT, WNDCLASSEXW, WS_OVERLAPPEDWINDOW, WS_VISIBLE,
+            }
         }
     }
 };
-
-use std::mem::transmute;
-use windows::*;
 
 fn main() -> Result<()> {
     run_app("GAME_WINDOW".to_string())?;
@@ -41,13 +49,12 @@ fn run_app(name: String) -> Result<()> {
 
         let wc = WNDCLASSEXW {
             cbSize: std::mem::size_of::<WNDCLASSEXW>() as u32,
-            hCursor: LoadCursorW(None, IDC_ARROW),
+            hCursor: LoadCursorW(None, IDC_ARROW).unwrap(),
             hInstance: instance,
-            lpszClassName: PWSTR(name.as_ptr() as _),
-            lpszMenuName: PWSTR::NULL,
+            lpszClassName: PCWSTR(name.as_ptr() as _),
             hbrBackground: CreateSolidBrush(0),
-            hIcon: LoadIconW(None, IDI_APPLICATION),
-            hIconSm: LoadIconW(None, IDI_APPLICATION),
+            hIcon: LoadIconW(None, IDI_APPLICATION).unwrap(),
+            hIconSm: LoadIconW(None, IDI_APPLICATION).unwrap(),
             cbClsExtra: 0,
             cbWndExtra: 0,
             lpfnWndProc: Some(wndproc),
@@ -61,7 +68,7 @@ fn run_app(name: String) -> Result<()> {
 
         let handle = CreateWindowExW(
             Default::default(),               // extended style
-            PWSTR(name.as_ptr() as _),        // class
+            PCWSTR(name.as_ptr() as _),        // class
             "T3D Game Console Version 1.0",   // title
             WS_OVERLAPPEDWINDOW | WS_VISIBLE, 
             CW_USEDEFAULT, CW_USEDEFAULT,     // initial x, y
@@ -73,8 +80,6 @@ fn run_app(name: String) -> Result<()> {
         );
 
         window.handle = handle;
-
-        debug_assert!(!handle.is_null());
 
         // initialize game here
         game::game_init::game_init();
